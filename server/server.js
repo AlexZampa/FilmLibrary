@@ -10,7 +10,7 @@ const app = new express();
 app.use(express.json());
 
 app.post('/api/films',
-    [check("title").isString(), check("favorite").isBoolean(), check("watchdate").isDate()], check("rating").isInt(), 
+    [check("title").isString(), check("favorite").isBoolean(), check("watchdate").isDate(), check("rating").isInt()],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -22,6 +22,33 @@ app.post('/api/films',
         } catch (err) {
             console.log(err);
             return res.status(503).end();
+        }
+    }
+);
+
+//Retrieve a film by ID
+app.get('/api/films/:filmid',
+    async (req, res) => {
+        try {
+            if(Number.isNaN(Number(req.params.filmid))){
+                return res.status(422).json({msg:"validation of filmid failed"});
+            }
+            const result = await FilmDAO.getFilm(req.params.filmid);
+            delete result.id;
+            result.watchDate ? result.watchDate=result.watchDate.format("YYYY-MM-DD") : undefined;
+            return res.status(200).json(result);
+            }
+         catch (err) {
+            console.log(err);
+            switch (err.err) {
+                case 404:
+                    return res.status(500).json({msg: err.msg});
+                    break;
+                default:
+                    return res.status(500).end();
+                    break;
+            }
+            
         }
     }
 );

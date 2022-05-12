@@ -16,4 +16,17 @@ exports.addFilm = async (title, favorite, watchdate, rating, user) => {
 };
     
 
+exports.getFilm = async (id) => {
+    try{
+        const sql = "SELECT * FROM films f WHERE f.id=?"
+        const result = await db.get(sql, [id], true);
+        if(!result){
+            throw {err: 404, msg: "no film associated to filmid"}
+        }
+        return new Film(result.id, result.title, result.favorite, result.watchdate ? result.watchdate : undefined, result.rating ? result.rating : 0);
+    } catch(err){
+        throw err;
+    }
+};
+
 
