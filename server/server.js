@@ -50,6 +50,9 @@ app.get('/api/films/:filmid',
                     return res.status(500).end();
                     break;
             }
+        }
+    }
+);
             
 
 app.get('/api/films', 
@@ -66,7 +69,7 @@ app.get('/api/films',
     }
 );
 
-// TODO
+
 app.get('/api/films/filter/:filterid',
     async (req, res) => {
         try {
