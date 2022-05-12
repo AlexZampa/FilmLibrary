@@ -10,4 +10,12 @@ function Film(id, title, isFavorite = false, watchDate = '', rating = 0) {
     this.watchDate = watchDate && dayjs(watchDate);
 }
 
-module.exports = Film;
+const filters = {
+                 "all" : (films) => { return films }, 
+                 "favorites" : (films) => { return films.filter(f => f.favorite); }, 
+                 "best-rated" : (films) => { return films.filter(f => f.rating === 5); },
+                 "seen-last-month" : (films) => { return films.filter(f => f.watchDate !== '' && f.watchDate.isAfter( dayjs().subtract(30, 'day'))); },
+                 "unseen" : (films) => { return films.filter(f => f.watchDate === ''); },
+                };
+
+module.exports = {Film, filters};

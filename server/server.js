@@ -4,10 +4,12 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const expressValidator = require('express-validator');
 const FilmDAO = require('./FilmDAO');
+const {filters} = require('./Film');
 
 const PORT = 3001;
 const app = new express();
 app.use(express.json());
+
 
 app.post('/api/films',
     [check("title").isString(), check("favorite").isBoolean(), check("watchdate").isDate(), check("rating").isInt()],
@@ -29,7 +31,7 @@ app.post('/api/films',
 app.get('/api/films', 
     async (req, res) => {
         try {
-            const films = await FilmDAO.getAllFilm(req.body.title, req.body.favorite, req.body.watchdate, req.body.rating, 1);
+            const films = await FilmDAO.getAllFilm();
             films.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY-MM-DD') : undefined);
             return res.status(200).json(films);
         } catch (err) {
@@ -38,6 +40,25 @@ app.get('/api/films',
         }
     }
 );
+
+// TODO
+app.get('/api/films/filter/:filterid',
+    async (req, res) => {
+        try {
+            if(filters[req.params.filterid]){
+                const films = await FilmDAO.getAllFilm();
+                const filteredFilms = filters[req.params.filterid](films);
+                filteredFilms.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY-MM-DD') : undefined);
+                return res.status(200).json(filteredFilms);
+            }
+            return res.status(422).json({msg : "invalid filterid"});
+        } catch (err) {
+            console.log(err);
+            return res.status(500).end();
+        }
+    }
+);
+
 
 
 

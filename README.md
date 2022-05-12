@@ -82,7 +82,7 @@ Error Response Header:
 GET `/api/films/filter/:filterid`
 
 Description: Get all the films available in the database that fulfill a given filter identified by its filterID
-
+             filterid can be [`all`, `favorites`, `seen-last-month`, `unseen`, `best-rated`]  
 Request URL: `http://localhost:port/api/films/filter/filter-favorite`
 Request body: _None_
 

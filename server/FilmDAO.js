@@ -1,6 +1,6 @@
 'use strict';
 
-const Film = require('./Film');
+const {Film} = require('./Film');
 const DBmanager = require('./DBmanager');
 
 const db = new DBmanager();
