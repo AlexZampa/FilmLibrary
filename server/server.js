@@ -49,8 +49,20 @@ app.get('/api/films/:filmid',
                     break;
             }
             
+
+app.get('/api/films', 
+    async (req, res) => {
+        try {
+            const films = await FilmDAO.getAllFilm(req.body.title, req.body.favorite, req.body.watchdate, req.body.rating, 1);
+            films.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY-MM-DD') : undefined);
+            return res.status(200).json(films);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).end();
+
         }
     }
 );
+
 
 app.listen(PORT, ()=>console.log(`Server running on http://localhost:${PORT}/`));
