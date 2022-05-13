@@ -88,5 +88,63 @@ app.get('/api/films/filter/:filterid',
 );
 
 
+//UPDATE FILM
+
+app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newFavorite").exists().isBoolean(), check("newWatchdate").exists().isDate(), check("newRating").exists().isInt()], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                return res.status(422).json({ msg: "validation of request body failed", errors : errors.array()});
+            }
+        const id = req.params.filmid;
+        const filmtoUpdate = req.body;
+        console.log(id);
+        console.log(filmtoUpdate);
+
+        await FilmDAO.updateFilm(filmtoUpdate,id);
+        res.status(200).end();
+      }
+      catch(err) {
+        console.error(err);
+        res.status(503).json({error: "Database error while updating."});
+      }
+    
+  });
+
+  //UPDATE FAVORITE
+
+  app.put('/api/films/:filmid/favorite',[check("favorite").exists().isBoolean()], async (req, res) => {
+      try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ msg: "validation of request body failed", errors : errors.array()});
+        }
+        const id = req.params.filmid;
+        const fav = req.body.favorite;
+        await FilmDAO.updateFilmfav(id,fav);
+        res.status(200).end();
+      }
+      catch(err) {
+        console.error(err);
+        res.status(503).json({error: "Database error while updating."});
+      }
+  });
+
+  //DELETE FILM
+
+  app.delete('/api/films/:filmid', async (req, res) => {
+    const id = req.params.filmid;
+        try {
+        await FilmDAO.deleteFilm(id);
+        res.status(200).end();
+      }
+      catch(err) {
+        console.error(err);
+        res.status(503).json({error: "Database error while updating."});
+      }
+    
+  });
+
+
 
 app.listen(PORT, ()=>console.log(`Server running on http://localhost:${PORT}/`));
