@@ -114,6 +114,7 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
   //UPDATE FAVORITE
 
   app.put('/api/films/:filmid/favorite',[check("favorite").exists().isBoolean()], async (req, res) => {
+      //TO DO: check if film exists
       try {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
