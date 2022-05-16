@@ -40,8 +40,16 @@ exports.getFilm = async (id) => {
 };
 
 // update an existing film
-exports.updateFilm = (film, id) => {
-    //check if film exists? here or in server.js
+exports.updateFilm = async (film, id) => {
+    //check if film exists
+
+    try {
+        await this.getFilm(id);
+        
+    } catch (err) {
+        throw err;
+    }
+
     try{
         const sql = 'UPDATE films SET title=?, favorite=?, watchdate=DATE(?), rating = ? WHERE id=?';
         console.log(film.newTitle);
@@ -55,8 +63,16 @@ exports.updateFilm = (film, id) => {
 
 
   //update status
-  exports.updateFilmfav = (id,fav) => {
-    //check if film exists? here or in server.js
+  exports.updateFilmfav = async (id,fav) => {
+    //check if film exists
+
+    try {
+        await this.getFilm(id);
+        
+    } catch (err) {
+        throw err;
+    }
+
     try{
         const sql = 'UPDATE films SET favorite=? WHERE id=?';
         db.query(sql, [fav,id])
@@ -68,8 +84,15 @@ exports.updateFilm = (film, id) => {
   
   
 // delete an existing film
-exports.deleteFilm = (filmid) => {
-    //check if film exists?
+exports.deleteFilm = async (filmid) => {
+    //check if film exists
+
+    try {
+        await this.getFilm(id);
+        
+    } catch (err) {
+        throw err;
+    }
     try{
         const sql = 'DELETE FROM films WHERE id=?';
         db.query(sql, [filmid]);

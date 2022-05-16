@@ -92,6 +92,9 @@ app.get('/api/films/filter/:filterid',
 
 app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newFavorite").exists().isBoolean(), check("newWatchdate").exists().isDate(), check("newRating").exists().isInt()], async (req, res) => {
     try {
+        if(Number.isNaN(Number(req.params.filmid))){
+            return res.status(422).json({msg:"validation of filmid failed"});
+        }
         const errors = validationResult(req);
             if(!errors.isEmpty()) {
                 return res.status(422).json({ msg: "validation of request body failed", errors : errors.array()});
@@ -106,7 +109,14 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
       }
       catch(err) {
         console.error(err);
-        res.status(503).json({error: "Database error while updating."});
+        switch (err.err) {
+            case 404:
+                return res.status(400).json({msg: err.msg});
+                break;
+            default:
+                return res.status(500).end();
+                break;
+        }
       }
     
   });
@@ -114,8 +124,11 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
   //UPDATE FAVORITE
 
   app.put('/api/films/:filmid/favorite',[check("favorite").exists().isBoolean()], async (req, res) => {
-      //TO DO: check if film exists
+      
       try {
+        if(Number.isNaN(Number(req.params.filmid))){
+            return res.status(422).json({msg:"validation of filmid failed"});
+        }
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
             return res.status(422).json({ msg: "validation of request body failed", errors : errors.array()});
@@ -127,13 +140,23 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
       }
       catch(err) {
         console.error(err);
-        res.status(503).json({error: "Database error while updating."});
+        switch (err.err) {
+            case 404:
+                return res.status(400).json({msg: err.msg});
+                break;
+            default:
+                return res.status(500).end();
+                break;
+        }
       }
   });
 
   //DELETE FILM
 
   app.delete('/api/films/:filmid', async (req, res) => {
+    if(Number.isNaN(Number(req.params.filmid))){
+        return res.status(422).json({msg:"validation of filmid failed"});
+    }
     const id = req.params.filmid;
         try {
         await FilmDAO.deleteFilm(id);
@@ -141,7 +164,14 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
       }
       catch(err) {
         console.error(err);
-        res.status(503).json({error: "Database error while updating."});
+        switch (err.err) {
+            case 404:
+                return res.status(400).json({msg: err.msg});
+                break;
+            default:
+                return res.status(500).end();
+                break;
+        }
       }
     
   });
