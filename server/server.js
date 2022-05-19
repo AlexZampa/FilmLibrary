@@ -5,11 +5,18 @@ const { check, validationResult } = require('express-validator');
 const expressValidator = require('express-validator');
 const FilmDAO = require('./FilmDAO');
 const {filters} = require('./Film');
+const cors = require('cors');
 
 const PORT = 3001;
 const app = new express();
 app.use(express.json());
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions));
 
 app.post('/api/films',
     [check("title").isString(), check("favorite").isBoolean(), check("watchdate").isDate(), check("rating").isInt()],
