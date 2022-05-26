@@ -23,10 +23,10 @@ function App() {
     }
   };
 
-  const updateFilm = (film) => {
+  const updateFilm = (film, fav) => {
     setFilms(oldFilms => {
       return oldFilms.map(f => {
-        if (film.id === f.id){
+        if (film.id === f.id) {
           const newFilm = new Film(film.id, film.title, film.favorite, film.watchDate, film.rating);
           newFilm.status = 'edited';
           return newFilm;
@@ -35,17 +35,24 @@ function App() {
           return f;
       });
     });
-    API.updateFilm(film).then(() => getFilm(back === "/" ? undefined : back)).catch((err) => console.log(err));
+    let newback = back.slice(8);
+    console.log(newback);
+    if (fav) { API.updateFavorite(film).then(() => getFilm(newback)).catch((err) => console.log(err)); }
+    else { API.updateFilm(film).then(() => getFilm(back === "/" ? undefined : back)).catch((err) => console.log(err)); }
+
   };
+
+
+
 
   const deleteFilm = (filmID, filterid) => {
     setFilms((oldFilms) => {
       return oldFilms.map(f => {
-        if(f.id === filmID)
-          return {...f, status: 'deleted'};
+        if (f.id === filmID)
+          return { ...f, status: 'deleted' };
         else
           return f;
-      }) 
+      })
     });
     API.deleteFilm(filmID).then(() => getFilm(filterid)).catch((err) => console.log(err));
   };

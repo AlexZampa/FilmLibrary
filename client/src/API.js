@@ -70,6 +70,24 @@ const updateFilm = async (film) => {
 };
 
 
+const updateFavorite = async (film) => {
+  try{
+    const response = await fetch(SERVER_URL + `/api/films/${film.id}/favorite`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({favorite: film.favorite})
+    });
+    if(!response.ok) {
+      const errMessage = await response.json(); 
+      throw errMessage;
+    }
+    else return null;
+  } catch(err) {
+    throw new Error('Cannot communicate with the server');
+  }
+};
+
+
 
 const deleteFilm = async (filmID) => {
   try{
@@ -86,5 +104,5 @@ const deleteFilm = async (filmID) => {
 
 
 
-const API = {getAllFilms, getFilterFilms, addFilm, deleteFilm, updateFilm};
+const API = {getAllFilms, getFilterFilms, addFilm, deleteFilm, updateFilm,updateFavorite};
 export default API;
