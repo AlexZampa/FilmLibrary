@@ -56,10 +56,10 @@ exports.updateFilm = async (film, id) => {
     }
 
     try{
-        const sql = 'UPDATE films SET title=?, favorite=?, watchdate=DATE(?), rating = ? WHERE id=?';
+        const sql = 'UPDATE films SET title=?, favorite=?, watchdate=?, rating = ? WHERE id=?';
         console.log(film.newTitle);
 
-        db.query(sql, [film.newTitle, film.newFavorite, film.newWatchdate,film.newRating, id]);
+        db.query(sql, [film.newTitle, film.newFavorite, film.newWatchDate,film.newRating, id]);
     }
     catch(err){
         throw err;

@@ -19,6 +19,7 @@ function App() {
     else {
       const films = await API.getAllFilms();
       setFilms(films);
+      console.log(films)
     }
   };
 

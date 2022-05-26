@@ -70,8 +70,9 @@ app.get('/api/films',
     async (req, res) => {
         try {
             const films = await FilmDAO.getAllFilm();
-            films.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY-MM-DD') : undefined);
+            films.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY/MM/DD') : undefined);
             return res.status(200).json(films);
+
         } catch (err) {
             console.log(err);
             return res.status(500).end();
@@ -113,8 +114,8 @@ check("newRating").exists().isInt()], async (req, res) => {
             }
         const id = req.params.filmid;
         const filmtoUpdate = req.body;
-        console.log(id);
-        console.log(filmtoUpdate);
+        
+        console.log(filmtoUpdate)
 
         await FilmDAO.updateFilm(filmtoUpdate,id);
         res.status(200).end();
