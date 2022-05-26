@@ -85,13 +85,13 @@ function FilmData(props) {
     // Catch Rating value
     const handleFav = (fav) => {
         setFav(fav);
-        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), true);
+        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), true,props.filter);
     }
 
     return (
         <>
             <td align="left">
-                <Link to={'/edit'} state={{ film: props.film, date: dayjs(props.film.watchDate).format('YYYY-MM-DD') }} >
+                <Link to={'/edit'} state={{ film: props.film, date: dayjs(props.film.watchDate).format('YYYY-MM-DD'), filter: props.filter}} >
                     <Button variant="outlined"> <PencilSquare /> </Button>
                 </Link>
                 <Button variant="outlined" onClick={() => props.deleteFilm(props.film.id, props.filter)}><Trash3Fill /> </Button>

@@ -21,7 +21,7 @@ function FilmForm(props) {
     const film = new Film(id, title, favorite, watchdate, rating);
     
     if(location.state){
-      props.updateFilm(film, props.back);
+      props.updateFilm(film,false, location.state.filter);
       navigate(props.back);
     }
     else{

@@ -1,5 +1,5 @@
 import './App.css';
-import { FilmLibrary, Film } from './filmLibrary'
+import {Film } from './filmLibrary'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { DefaultRoute, FilmRoute, EditRoute, FilmPage } from './components/filmRoutes';
@@ -19,11 +19,11 @@ function App() {
     else {
       const films = await API.getAllFilms();
       setFilms(films);
-      console.log(films)
+      
     }
   };
 
-  const updateFilm = (film, fav) => {
+  const updateFilm = (film, fav,filter) => {
     setFilms(oldFilms => {
       return oldFilms.map(f => {
         if (film.id === f.id) {
@@ -35,10 +35,9 @@ function App() {
           return f;
       });
     });
-    let newback = back.slice(8);
-    console.log(newback);
-    if (fav) { API.updateFavorite(film).then(() => getFilm(newback)).catch((err) => console.log(err)); }
-    else { API.updateFilm(film).then(() => getFilm(back === "/" ? undefined : back)).catch((err) => console.log(err)); }
+    
+    if (fav) { API.updateFavorite(film).then(() => getFilm(filter)).catch((err) => console.log(err)); }
+    else { API.updateFilm(film).then(() => getFilm(filter)).catch((err) => console.log(err)); }
 
   };
 

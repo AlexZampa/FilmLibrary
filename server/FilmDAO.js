@@ -57,7 +57,6 @@ exports.updateFilm = async (film, id) => {
 
     try{
         const sql = 'UPDATE films SET title=?, favorite=?, watchdate=?, rating = ? WHERE id=?';
-        console.log(film.newTitle);
 
         db.query(sql, [film.newTitle, film.newFavorite, film.newWatchDate,film.newRating, id]);
     }
