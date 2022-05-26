@@ -5,10 +5,15 @@ const DBmanager = require('./DBmanager');
 
 const db = new DBmanager();
 
-exports.addFilm = async (title, favorite, watchdate, rating, user) => {
+exports.addFilm = async (id, title, favorite, watchdate, rating, user) => {
     try{
-        const sql = "INSERT INTO films (title, favorite, watchdate, rating, user) VALUES (?, ?, ?, ?, ?)"
-        const result = await db.query(sql, [title, favorite, watchdate, rating, user]);
+        let sql = "SELECT * FROM films f WHERE f.id=?"
+        let result = await db.get(sql, [id], true);
+        if(result){
+            throw {err: 422, msg: "film already exists"};
+        }
+        sql = "INSERT INTO films (id, title, favorite, watchdate, rating, user) VALUES (?, ?, ?, ?, ?, ?)"
+        result = await db.query(sql, [id, title, favorite, watchdate, rating, user]);
         return result;
     } catch(err){
         throw err;
@@ -85,14 +90,6 @@ exports.updateFilm = async (film, id) => {
   
 // delete an existing film
 exports.deleteFilm = async (filmid) => {
-    //check if film exists
-
-    try {
-        await this.getFilm(id);
-        
-    } catch (err) {
-        throw err;
-    }
     try{
         const sql = 'DELETE FROM films WHERE id=?';
         db.query(sql, [filmid]);

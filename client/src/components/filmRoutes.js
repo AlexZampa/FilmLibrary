@@ -4,7 +4,6 @@ import { NavBarApp } from './navBarComponents';
 import { FilmApp } from './filmComponents';
 import { FilmForm } from './filmForm';
 import { Outlet } from 'react-router-dom';
-import API from '../API';
 import {useParams} from 'react-router-dom';
 import {useEffect} from 'react';
 
@@ -46,21 +45,10 @@ function EditRoute(props){
 
 
 function FilmPage(props){
-
     const {filterid} = useParams();
 
     useEffect(()=>{
-        const getFilm = async () => {
-            if(filterid){
-          const films = await API.getFilterFilms(filterid);
-          props.setFilms(films);
-            }
-            else{
-            const films = await API.getAllFilms();
-            props.setFilms(films);
-            }
-        };
-        getFilm();
+        props.getFilm(filterid);
     }, [filterid]); 
 
     return(

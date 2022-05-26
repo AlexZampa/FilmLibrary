@@ -60,14 +60,14 @@ Response body:
         "id" : 1,
         "title" : "Pulp Fiction",
         "favorite" : true,
-        "watchdate" : "2022-03-11",
+        "watchDate" : "2022-03-11",
         "rating" : 5
     },
     {
         "id" : 2,
         "title" : "21 Grams",
         "favorite" : false,
-        "watchdate" : "2022-03-17",
+        "watchDate" : "2022-03-17",
         "rating" : 4
     },
     ...
@@ -94,14 +94,14 @@ Response body:
         "id" : 1,
         "title" : "Pulp Fiction",
         "favorite" : true,
-        "watchdate" : "2022-03-11",
+        "watchDate" : "2022-03-11",
         "rating" : 5
     },
     {
         "id" : 2,
         "title" : "21 Grams",
         "favorite" : true,
-        "watchdate" : "2022-03-17",
+        "watchDate" : "2022-03-17",
         "rating" : 4
     },
     ...
@@ -128,7 +128,7 @@ Response body:
         "id" : 2,
         "title" : "21 Grams",
         "favorite" : true,
-        "watchdate" : "2022-03-17",
+        "watchDate" : "2022-03-17",
         "rating" : 4
     }
 ```
@@ -145,12 +145,13 @@ POST `/api/films`
 Description: Create a new film
 
 Request URL: `http://localhost:port/api/films`
-Request body: _watchdate_ can be null
+Request body: _watchDate_ can be null
 ```
     {
+        "id" : 1
         "title" : "a new film",
         "favorite" : false,
-        "watchdate" : "2021-02-15",
+        "watchDate" : "2021-02-15",
         "rating" : 3
     }
 ```
@@ -175,7 +176,7 @@ Request body:
     {
         "newTitle" : "different title",
         "newFavorite" : true,
-        "newWatchdate" : "2021-02-20",
+        "newWatchDate" : "2021-02-20",
         "newRating" : 4
     }
 ```

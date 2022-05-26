@@ -45,7 +45,7 @@ function FilmTable(props){
                     </tr>
             </thead>
             <tbody>
-                { props.films.map((film) => <FilmRow film={film} key={film.id} deleteFilm={props.deleteFilm} updateFilm={props.updateFilm}/>) }
+                { props.films.map((film) => <FilmRow film={film} key={film.id} deleteFilm={props.deleteFilm} updateFilm={props.updateFilm} filter={props.filter}/>) }
             </tbody>
             </Table>
             <Link to='/add'>
@@ -57,9 +57,24 @@ function FilmTable(props){
 
 
 function FilmRow(props) {
+    let statusClass = null;
+
+    switch(props.film.status){
+        case 'added':
+            statusClass = 'table-success';
+            break;
+        case 'edited':
+            statusClass = 'table-warning';
+            break;
+        case 'deleted':
+            statusClass = 'table-danger';
+            break;
+        default: break;
+    }
+
     return(
-        <tr>
-            <FilmData film={props.film} deleteFilm={props.deleteFilm} updateFilm={props.updateFilm}/>
+        <tr className={statusClass}>
+            <FilmData film={props.film} deleteFilm={props.deleteFilm} updateFilm={props.updateFilm} filter={props.filter}/>
         </tr>
         )
 };
@@ -79,7 +94,7 @@ function FilmData(props){
             <Link to={'/edit'} state={ {film: props.film, date: dayjs(props.film.watchDate).format('YYYY-MM-DD') } } >
                 <Button variant="outlined"> <PencilSquare/> </Button>
             </Link>
-            <Button variant="outlined" onClick={() => props.deleteFilm(props.film.id)}><Trash3Fill /> </Button> 
+            <Button variant="outlined" onClick={() => props.deleteFilm(props.film.id, props.filter)}><Trash3Fill /> </Button> 
             <span className={fav ? "favorite" : "favoriteb" }>{props.film.title}</span>
         </td> 
         <td> 
@@ -92,7 +107,7 @@ function FilmData(props){
                 </Form.Group>
             </Form>
         </td>
-        <td> {props.film.watchDate ? props.film.watchDate.format("YYYY-MM-DD") : "" } </td>
+        <td> {props.film.watchDate ? dayjs(props.film.watchDate).format("YYYY-MM-DD") : "" } </td>
         <td> <StarRating film={props.film} updateFilm={props.updateFilm}/> </td>
     </>);
 };

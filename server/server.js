@@ -19,39 +19,43 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.post('/api/films',
-    [check("title").isString(), check("favorite").isBoolean(), check("watchdate").isDate(), check("rating").isInt()],
+    [check('id').isInt({min: 1}), check("title").isString(), check("favorite").isBoolean(), check("watchDate").isDate(), check("rating").isInt()],
     async (req, res) => {
         try {
             const errors = validationResult(req);
             if(!errors.isEmpty()) {
+                console.log(errors);
                 return res.status(422).json({ msg: "validation of request body failed", errors : errors.array()});
             }
-            const result = await FilmDAO.addFilm(req.body.title, req.body.favorite, req.body.watchdate, req.body.rating, 1);
-            return res.status(201).end();
+            const result = await FilmDAO.addFilm(req.body.id, req.body.title, req.body.favorite, req.body.watchDate, req.body.rating, 1);
+            setTimeout(() => res.status(201).end(), 5000);
         } catch (err) {
             console.log(err);
+            if(err.err === 422){
+                return res.status(422).send(err.msg);    
+            }
             return res.status(503).end();
         }
     }
 );
 
 //Retrieve a film by ID
-app.get('/api/films/:filmid',
+app.get('/api/films/:filmid', [check('filmid').isInt({min: 1})],
     async (req, res) => {
         try {
-            if(Number.isNaN(Number(req.params.filmid))){
-                return res.status(422).json({msg:"validation of filmid failed"});
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                console.log(errors);
+                return res.status(422).json({ msg: "validation of request failed", errors : errors.array()});
             }
             const result = await FilmDAO.getFilm(req.params.filmid);
-            delete result.id;
-            result.watchDate ? result.watchDate=result.watchDate.format("YYYY-MM-DD") : undefined;
             return res.status(200).json(result);
             }
          catch (err) {
             console.log(err);
             switch (err.err) {
                 case 404:
-                    return res.status(500).json({msg: err.msg});
+                    return res.status(404).json({msg: err.msg});
                     break;
                 default:
                     return res.status(500).end();
@@ -96,12 +100,13 @@ app.get('/api/films/filter/:filterid',
 
 
 //UPDATE FILM
-
-app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newFavorite").exists().isBoolean(), check("newWatchdate").exists().isDate(), check("newRating").exists().isInt()], async (req, res) => {
+app.put('/api/films/:filmid',
+[check('filmid').isInt({min: 1}),
+check("newTitle").exists().isString(), 
+check("newFavorite").exists().isBoolean(), 
+check("newWatchdate").optional().isDate(), 
+check("newRating").exists().isInt()], async (req, res) => {
     try {
-        if(Number.isNaN(Number(req.params.filmid))){
-            return res.status(422).json({msg:"validation of filmid failed"});
-        }
         const errors = validationResult(req);
             if(!errors.isEmpty()) {
                 return res.status(422).json({ msg: "validation of request body failed", errors : errors.array()});
@@ -129,9 +134,7 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
   });
 
   //UPDATE FAVORITE
-
   app.put('/api/films/:filmid/favorite',[check("favorite").exists().isBoolean()], async (req, res) => {
-      
       try {
         if(Number.isNaN(Number(req.params.filmid))){
             return res.status(422).json({msg:"validation of filmid failed"});
@@ -159,21 +162,19 @@ app.put('/api/films/:filmid',[check("newTitle").exists().isString(), check("newF
   });
 
   //DELETE FILM
-
-  app.delete('/api/films/:filmid', async (req, res) => {
-    if(Number.isNaN(Number(req.params.filmid))){
-        return res.status(422).json({msg:"validation of filmid failed"});
-    }
+  app.delete('/api/films/:filmid', [check('filmid').isInt({min: 1})],
+    async (req, res) => {
     const id = req.params.filmid;
-        try {
+      try {
+        const result = await FilmDAO.getFilm(id);
         await FilmDAO.deleteFilm(id);
-        res.status(200).end();
+        res.status(204).end();
       }
       catch(err) {
         console.error(err);
         switch (err.err) {
             case 404:
-                return res.status(400).json({msg: err.msg});
+                return res.status(404).json({msg: err.msg});
                 break;
             default:
                 return res.status(500).end();
