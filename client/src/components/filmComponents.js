@@ -1,5 +1,5 @@
 import { Button, Col, Container, Form, FormCheck, Table } from 'react-bootstrap';
-// import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Rating } from 'react-simple-star-rating'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -85,7 +85,7 @@ function FilmData(props) {
     // Catch Rating value
     const handleFav = (fav) => {
         setFav(fav);
-        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), true,props.filter);
+        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), true, props.filter);
     }
 
     return (
@@ -108,7 +108,7 @@ function FilmData(props) {
                 </Form>
             </td>
             <td> {props.film.watchDate ? dayjs(props.film.watchDate).format("YYYY-MM-DD") : ""} </td>
-            <td> <StarRating film={props.film} updateFilm={props.updateFilm} /> </td>
+            <td> <StarRating film={props.film} updateFilm={props.updateFilm} filter={props.filter}/> </td>
         </>);
 };
 
@@ -121,7 +121,7 @@ function StarRating(props) {
         const starValue = 20;           // rate range from 0 to 100 (each star has value = 20)
         if (rating !== rate / starValue) {
             setRating(rate / starValue);
-            props.updateFilm(new Film(props.film.id, props.film.title, props.film.favorite, props.film.watchDate, rate / starValue));
+            props.updateFilm(new Film(props.film.id, props.film.title, props.film.favorite, props.film.watchDate, rate / starValue), true, props.filter);
         }
     }
 

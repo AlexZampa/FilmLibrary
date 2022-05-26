@@ -7,7 +7,6 @@ import { Outlet } from 'react-router-dom';
 import {useParams} from 'react-router-dom';
 import {useEffect} from 'react';
 
-
 function DefaultRoute(props){
     return(
         <Container className='App'>
@@ -18,12 +17,12 @@ function DefaultRoute(props){
 
 function FilmRoute(props){
     return(
-        <Container fluid className='App'>
-            <Row>
-                <NavBarApp/>
-            </Row>
-                <Outlet/>
-        </Container>
+            <Container fluid className='App'>
+                <Row>
+                    <NavBarApp/>
+                </Row>
+                    <Outlet/>
+            </Container>
     );
 };
 

@@ -18,6 +18,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+//CREATE FILM
 app.post('/api/films',
     [check('id').isInt({ min: 1 }), check("title").isString(), check("favorite").isBoolean(), check("watchDate").isDate(), check("rating").isInt()],
     async (req, res) => {
@@ -25,28 +26,28 @@ app.post('/api/films',
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 console.log(errors);
-                return res.status(422).json({ msg: "validation of request body failed", errors: errors.array() });
+                return res.status(422).json({ msg: "validation of request body failed" });
             }
             const result = await FilmDAO.addFilm(req.body.id, req.body.title, req.body.favorite, req.body.watchDate, req.body.rating, 1);
-            res.status(201).end()
+            return res.status(201).end();
         } catch (err) {
             console.log(err);
             if (err.err === 422) {
-                return res.status(422).send(err.msg);
+                return res.status(422).json({ msg: err.msg });
             }
             return res.status(503).end();
         }
     }
 );
 
-//Retrieve a film by ID
+//GET FILM BY ID
 app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
     async (req, res) => {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 console.log(errors);
-                return res.status(422).json({ msg: "validation of request failed", errors: errors.array() });
+                return res.status(422).json({ msg: "validation of request failed" });
             }
             const result = await FilmDAO.getFilm(req.params.filmid);
             return res.status(200).json(result);
@@ -56,16 +57,14 @@ app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
             switch (err.err) {
                 case 404:
                     return res.status(404).json({ msg: err.msg });
-                    break;
                 default:
                     return res.status(500).end();
-                    break;
             }
         }
     }
 );
 
-
+// GET ALL FILMS
 app.get('/api/films',
     async (req, res) => {
         try {
@@ -76,12 +75,11 @@ app.get('/api/films',
         } catch (err) {
             console.log(err);
             return res.status(500).end();
-
         }
     }
 );
 
-
+// GET FILTERED FILMS
 app.get('/api/films/filter/:filterid',
     async (req, res) => {
         try {
@@ -106,17 +104,45 @@ app.put('/api/films/:filmid',
     check("newTitle").exists().isString(),
     check("newFavorite").exists().isBoolean(),
     check("newWatchdate").optional().isDate(),
-    check("newRating").exists().isInt()], async (req, res) => {
+    check("newRating").exists().isInt()],
+    async (req, res) => {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                return res.status(422).json({ msg: "validation of request body failed", errors: errors.array() });
+                return res.status(422).json({ msg: "validation of request body failed" });
             }
             const id = req.params.filmid;
             const filmtoUpdate = req.body;
 
 
             await FilmDAO.updateFilm(filmtoUpdate, id);
+            return res.status(200).end();
+        }
+        catch (err) {
+            console.error(err);
+            switch (err.err) {
+                case 404:
+                    return res.status(400).json({ msg: err.msg });
+                default:
+                    return res.status(500).end();
+            }
+        }
+    });
+
+
+//UPDATE FAVORITE
+app.put('/api/films/:filmid/favorite', [
+    check('filmid').isInt({ min: 1 }),
+    check("favorite").exists().isBoolean()],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ msg: "validation of request body failed" });
+            }
+            const id = req.params.filmid;
+            const fav = req.body.favorite;
+            await FilmDAO.updateFilmfav(id, fav);
             res.status(200).end();
         }
         catch (err) {
@@ -124,42 +150,12 @@ app.put('/api/films/:filmid',
             switch (err.err) {
                 case 404:
                     return res.status(400).json({ msg: err.msg });
-                    break;
                 default:
                     return res.status(500).end();
-                    break;
             }
         }
-
     });
 
-//UPDATE FAVORITE
-app.put('/api/films/:filmid/favorite', [check("favorite").exists().isBoolean()], async (req, res) => {
-    try {
-        if (Number.isNaN(Number(req.params.filmid))) {
-            return res.status(422).json({ msg: "validation of filmid failed" });
-        }
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ msg: "validation of request body failed", errors: errors.array() });
-        }
-        const id = req.params.filmid;
-        const fav = req.body.favorite;
-        await FilmDAO.updateFilmfav(id, fav);
-        res.status(200).end();
-    }
-    catch (err) {
-        console.error(err);
-        switch (err.err) {
-            case 404:
-                return res.status(400).json({ msg: err.msg });
-                break;
-            default:
-                return res.status(500).end();
-                break;
-        }
-    }
-});
 
 //DELETE FILM
 app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
@@ -175,10 +171,8 @@ app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
             switch (err.err) {
                 case 404:
                     return res.status(404).json({ msg: err.msg });
-                    break;
                 default:
                     return res.status(500).end();
-                    break;
             }
         }
 

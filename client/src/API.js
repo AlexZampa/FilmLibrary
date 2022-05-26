@@ -12,7 +12,7 @@ const getAllFilms = async () => {
     else
       throw filmJson;
   }catch(err){
-    throw new Error('Cannot communicate with the server');
+    throw new Error(err.msg);
   }
 };
 
@@ -26,7 +26,7 @@ const getFilterFilms = async (filterId) => {
     else
       throw filmJson;
   } catch(err){
-    throw new Error('Cannot communicate with the server');
+    throw new Error(err.msg);
   }
 };
 
@@ -34,7 +34,6 @@ const getFilterFilms = async (filterId) => {
 
 const addFilm = async (film) => {
   try{
-
     film.watchDate = film.watchDate.format('YYYY/MM/DD');
     const response = await fetch(SERVER_URL + '/api/films', {
       method: 'POST',
@@ -47,7 +46,7 @@ const addFilm = async (film) => {
     }
     else return null;
   } catch(err){
-    throw new Error('Cannot communicate with the server');
+    throw new Error(err.msg);
   }
 };
 
@@ -65,7 +64,7 @@ const updateFilm = async (film) => {
     }
     else return null;
   } catch(err) {
-    throw new Error('Cannot communicate with the server');
+    throw new Error(err.msg);
   }
 };
 
@@ -83,7 +82,7 @@ const updateFavorite = async (film) => {
     }
     else return null;
   } catch(err) {
-    throw new Error('Cannot communicate with the server');
+    throw new Error(err.msg);
   }
 };
 
@@ -98,7 +97,7 @@ const deleteFilm = async (filmID) => {
     }
     return null;
   }catch(err){
-    throw new Error('Cannot communicate with the server');
+    throw new Error(err.msg);
   }
 };
 
