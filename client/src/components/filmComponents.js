@@ -85,7 +85,7 @@ function FilmData(props) {
     // Catch Rating value
     const handleFav = (fav) => {
         setFav(fav);
-        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), true, props.filter);
+        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), props.filter, 'favorite');
     }
 
     return (
@@ -121,7 +121,7 @@ function StarRating(props) {
         const starValue = 20;           // rate range from 0 to 100 (each star has value = 20)
         if (rating !== rate / starValue) {
             setRating(rate / starValue);
-            props.updateFilm(new Film(props.film.id, props.film.title, props.film.favorite, props.film.watchDate, rate / starValue), true, props.filter);
+            props.updateFilm(new Film(props.film.id, props.film.title, props.film.favorite, props.film.watchDate, rate / starValue), props.filter, 'rating');
         }
     }
 

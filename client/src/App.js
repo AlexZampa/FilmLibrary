@@ -21,12 +21,12 @@ function App() {
     }
     else {
       const films = await API.getAllFilms();
-      setFilms(films);  
+      setFilms(films);
     }
   };
 
   // update film
-  const updateFilm = (film, inlineEdit, filter) => {
+  const updateFilm = (film, filter, editType) => {
     setFilms(oldFilms => {
       return oldFilms.map(f => {
         if (film.id === f.id) {
@@ -38,18 +38,25 @@ function App() {
           return f;
       });
     });
-    
-    if(inlineEdit){ 
-      API.updateFavorite(film).then(() => {
-        getFilm(filter);
-      }).catch((err) => { toast.error(err.message); });
-    }
-    else{ 
-      API.updateFilm(film).then(() => {
-        toast.success("Film updated!");
-      }).catch((err) => { toast.error(err.message); }); 
+
+    switch (editType) {
+      case 'favorite':
+        API.updateFavorite(film).then(() => {
+          getFilm(filter);
+        }).catch((err) => { toast.error(err.message); });
+        break;
+      case 'rating':
+        API.updateFilm(film).then(() => {
+          getFilm(filter);
+        }).catch((err) => { toast.error(err.message); });
+        break;
+      default:
+        API.updateFilm(film).then(() => {
+          toast.success("Film updated!");
+        }).catch((err) => { toast.error(err.message); });
     }
   };
+
 
   // delete film
   const deleteFilm = (filmID, filterid) => {
@@ -78,19 +85,19 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ToastContainer position="top-right" theme="light" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover={false} limit={3} transition={Slide}/>
-        <Routes>
-          <Route path='/' element={<FilmRoute/>} >
-            <Route index element={<FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
-          </Route>
-          <Route path='*' element={<DefaultRoute />} />
-          <Route path="/add" element={<EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back}/>} />
-          <Route path="/edit" element={<EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} />} />
-          <Route path='/filter' element={<FilmRoute/>}>
-            <Route index element={<h2>Please, specify a filter</h2>} />
-            <Route path=':filterid' element={<FilmPage getFilm={getFilm} films={films} setFilms={setFilms} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
-          </Route>
-        </Routes>
+      <ToastContainer position="top-right" theme="light" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover={false} limit={3} transition={Slide} />
+      <Routes>
+        <Route path='/' element={<FilmRoute />} >
+          <Route index element={<FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
+        </Route>
+        <Route path='*' element={<DefaultRoute />} />
+        <Route path="/add" element={<EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back} />} />
+        <Route path="/edit" element={<EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} />} />
+        <Route path='/filter' element={<FilmRoute />}>
+          <Route index element={<h2>Please, specify a filter</h2>} />
+          <Route path=':filterid' element={<FilmPage getFilm={getFilm} films={films} setFilms={setFilms} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -31,10 +31,9 @@ const getFilterFilms = async (filterId) => {
 };
 
 
-
 const addFilm = async (film) => {
   try{
-    film.watchDate = film.watchDate.format('YYYY/MM/DD');
+    film.watchDate = film.watchDate ? film.watchDate.format('YYYY/MM/DD') : "";
     const response = await fetch(SERVER_URL + '/api/films', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -56,7 +55,7 @@ const updateFilm = async (film) => {
     const response = await fetch(SERVER_URL + `/api/films/${film.id}`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({newTitle: film.title, newFavorite: film.favorite, newWatchDate: film.watchDate, newRating: film.rating})
+      body: JSON.stringify({newTitle: film.title, newFavorite: film.favorite, newWatchDate: film.watchDate ? film.watchDate.format('YYYY/MM/DD') : "", newRating: film.rating})
     });
     if(!response.ok) {
       const errMessage = await response.json(); 
@@ -103,5 +102,5 @@ const deleteFilm = async (filmID) => {
 
 
 
-const API = {getAllFilms, getFilterFilms, addFilm, deleteFilm, updateFilm,updateFavorite};
+const API = {getAllFilms, getFilterFilms, addFilm, deleteFilm, updateFilm, updateFavorite};
 export default API;

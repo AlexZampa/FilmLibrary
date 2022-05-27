@@ -18,10 +18,10 @@ function FilmForm(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const film = new Film(id, title, favorite, watchdate, rating);
+    const film = new Film(id, title, favorite, watchdate.isValid() ? watchdate : "", rating);
     
     if(location.state){
-      props.updateFilm(film,false, location.state.filter);
+      props.updateFilm(film, location.state.filter);
       navigate(props.back);
     }
     else{
