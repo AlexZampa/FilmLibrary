@@ -3,15 +3,17 @@ import { Film } from './filmLibrary'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast, Slide } from "react-toastify";
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { DefaultRoute, FilmRoute, EditRoute, FilmPage } from './components/filmRoutes';
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { DefaultRoute, FilmRoute, EditRoute, FilmPage, LoginRoute} from './components/filmRoutes';
+import { useState , useEffect} from 'react';
 import API from './API';
 
 
 function App() {
   const [films, setFilms] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [back, setBack] = useState("/");
+  const [message, setMessage] = useState('');
 
 
   const getFilm = async (filterid) => {
@@ -82,18 +84,59 @@ function App() {
       toast.success("Film added!");
     }).catch((err) => { toast.error(err.message); });
   };
+  useEffect(() => {
+    const checkAuth = async () => {
+      await API.getUserInfo(); // we have the user info here
+      setLoggedIn(true);
+    };
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn)
+      getFilm();
+  }, [loggedIn]);
+
+  const handleLogin = async (credentials) => {
+    try {
+      const user = await API.logIn(credentials);
+      setLoggedIn(true);
+      setMessage({ msg: `Welcome, ${user.name}!`, type: 'success' });
+    } catch (err) {
+      console.log(err);
+      setMessage({ msg: err, type: 'danger' });
+    }
+  };
+
+  const handleLogout = async () => {
+    await API.logOut();
+    setLoggedIn(false);
+    // clean up everything
+    setFilms([]);
+    setMessage('');
+  };
+
 
   return (
     <BrowserRouter>
       <ToastContainer position="top-right" theme="light" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover={false} limit={3} transition={Slide} />
       <Routes>
-        <Route path='/' element={<FilmRoute />} >
-          <Route index element={<FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
+        <Route path='/login' element={
+          loggedIn ? <Navigate replace to='/' /> : <LoginRoute login={handleLogin} />
+        } />
+        <Route path='/' element={
+          loggedIn ? <FilmRoute /> : <Navigate replace to='/login' />
+        } >
+          <Route index element={
+            loggedIn ? <FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} /> : <Navigate replace to='/login' />} />
         </Route>
         <Route path='*' element={<DefaultRoute />} />
-        <Route path="/add" element={<EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back} />} />
-        <Route path="/edit" element={<EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} />} />
-        <Route path='/filter' element={<FilmRoute />}>
+        <Route path="/add" element={
+          loggedIn ? <EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back} /> : <Navigate replace to='/login' />} />
+        <Route path="/edit" element={
+        loggedIn ? <EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} /> : <Navigate replace to='/login' />} />
+        <Route path='/filter' element={
+        loggedIn ? <FilmRoute /> : <Navigate replace to='/login' />}>
           <Route index element={<h2>Please, specify a filter</h2>} />
           <Route path=':filterid' element={<FilmPage getFilm={getFilm} films={films} setFilms={setFilms} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
         </Route>

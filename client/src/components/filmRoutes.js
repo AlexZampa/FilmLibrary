@@ -2,6 +2,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { SideBarApp } from './sideBarComponents';
 import { NavBarApp } from './navBarComponents';
 import { FilmApp } from './filmComponents';
+import { LoginForm } from './authenticationComponents';
 import { FilmForm } from './filmForm';
 import { Outlet } from 'react-router-dom';
 import {useParams} from 'react-router-dom';
@@ -62,5 +63,22 @@ function FilmPage(props){
     );
 };
 
+function LoginRoute(props) {
+    return(
+        <Container fluid className='App'>
+        <Row>
+          <Col>
+            <h1>Login</h1>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <LoginForm login={props.login} />
+          </Col>
+        </Row>
+        </Container>
+    );
+  }
+  
 
-export {DefaultRoute, FilmRoute, EditRoute, FilmPage};
+export {DefaultRoute, FilmRoute, EditRoute, FilmPage, LoginRoute};
