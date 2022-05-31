@@ -6,6 +6,10 @@ const expressValidator = require('express-validator');
 const FilmDAO = require('./FilmDAO');
 const { filters } = require('./Film');
 const cors = require('cors');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const session = require('express-session');
+const userDao = require('./UserDAO');
 
 const PORT = 3001;
 const app = new express();
@@ -13,10 +17,44 @@ app.use(express.json());
 
 const corsOptions = {
     origin: 'http://localhost:3000',
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    credentials: true,
 }
 
 app.use(cors(corsOptions));
+
+passport.use(new LocalStrategy(async function verify(username, password, cb) {
+    const user = await userDao.getUser(username, password)
+    if(!user)
+      return cb(null, false, 'Incorrect username or password.');
+      
+    return cb(null, user);
+  }));
+  
+  passport.serializeUser(function (user, cb) {
+    cb(null, user);
+  });
+  
+  passport.deserializeUser(function (user, cb) { // this user is id + email + name
+    return cb(null, user);
+    // if needed, we can do extra check here (e.g., double check that the user is still in the database, etc.)
+  });
+  
+  const isLoggedIn = (req, res, next) => {
+    if(req.isAuthenticated()) {
+      return next();
+    }
+    return res.status(401).json({error: 'Not authorized'});
+  }
+  
+  app.use(session({
+    secret: "shhhhh... it's a secret!",
+    resave: false,
+    saveUninitialized: false,
+  }));
+  app.use(passport.authenticate('session'));
+  
+  
 
 //CREATE FILM
 app.post('/api/films',
@@ -24,7 +62,7 @@ app.post('/api/films',
     check("title").isString(), 
     check("favorite").isBoolean(), 
     check("watchDate").optional({checkFalsy: true}).isDate(), 
-    check("rating").isInt()],
+    check("rating").isInt(),isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -45,7 +83,7 @@ app.post('/api/films',
 );
 
 //GET FILM BY ID
-app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
+app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }),isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -69,7 +107,7 @@ app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
 );
 
 // GET ALL FILMS
-app.get('/api/films',
+app.get('/api/films',isLoggedIn,
     async (req, res) => {
         try {
             const films = await FilmDAO.getAllFilm(1);
@@ -83,7 +121,7 @@ app.get('/api/films',
 );
 
 // GET FILTERED FILMS
-app.get('/api/films/filter/:filterid',
+app.get('/api/films/filter/:filterid',isLoggedIn,
     async (req, res) => {
         try {
             if (filters[req.params.filterid]) {
@@ -107,7 +145,7 @@ app.put('/api/films/:filmid',
     check("newTitle").exists().isString(),
     check("newFavorite").exists().isBoolean(),
     check("newWatchdate").optional({checkFalsy: true}).isDate(),
-    check("newRating").exists().isInt()],
+    check("newRating").exists().isInt(),isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -135,7 +173,7 @@ app.put('/api/films/:filmid',
 //UPDATE FAVORITE
 app.put('/api/films/:filmid/favorite', [
     check('filmid').isInt({ min: 1 }),
-    check("favorite").exists().isBoolean()],
+    check("favorite").exists().isBoolean(), isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -160,7 +198,7 @@ app.put('/api/films/:filmid/favorite', [
 
 
 //DELETE FILM
-app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
+app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 }),isLoggedIn],
     async (req, res) => {
         const id = req.params.filmid;
         try {
@@ -179,6 +217,26 @@ app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 })],
         }
 
     });
+
+//API ON USERLOGIN 
+app.post('/api/sessions', function(req, res, next) {
+    passport.authenticate('local', (err, user, info) => {
+      if (err)
+        return next(err);
+        if (!user) {
+          // display wrong login messages
+          return res.status(401).send(info);
+        }
+        // success, perform the login
+        req.login(user, (err) => {
+          if (err)
+            return next(err);
+          
+          // req.user contains the authenticated user, we send all the user info back
+          return res.status(201).json(req.user);
+        });
+    })(req, res, next);
+  });
 
 
 
