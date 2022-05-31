@@ -4,7 +4,7 @@ const SERVER_URL = "http://localhost:3001";
 
 const getAllFilms = async () => {
   try{
-    const response = await fetch(SERVER_URL + '/api/films');
+    const response = await fetch(SERVER_URL + '/api/films', {credentials: 'include'});
     const filmJson = await response.json();
     if(response.ok) {
       return filmJson.map(f => new Film(f.id,f.title, f.favorite, f.watchDate, f.rating));
@@ -18,7 +18,7 @@ const getAllFilms = async () => {
 
 const getFilterFilms = async (filterId) => {
   try{
-    const response = await fetch(SERVER_URL + `/api/films/filter/${filterId}`);
+    const response = await fetch(SERVER_URL + `/api/films/filter/${filterId}`, {credentials: 'include'});
     const filmJson = await response.json();
     if(response.ok) {
       return filmJson.map(f => new Film(f.id,f.title, f.favorite, f.watchDate, f.rating));
@@ -37,6 +37,7 @@ const addFilm = async (film) => {
     const response = await fetch(SERVER_URL + '/api/films', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
       body: JSON.stringify(film)
     });
     if(!response.ok) {
@@ -55,6 +56,7 @@ const updateFilm = async (film) => {
     const response = await fetch(SERVER_URL + `/api/films/${film.id}`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
       body: JSON.stringify({newTitle: film.title, newFavorite: film.favorite, newWatchDate: film.watchDate ? film.watchDate.format('YYYY/MM/DD') : "", newRating: film.rating})
     });
     if(!response.ok) {
@@ -73,6 +75,7 @@ const updateFavorite = async (film) => {
     const response = await fetch(SERVER_URL + `/api/films/${film.id}/favorite`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
       body: JSON.stringify({favorite: film.favorite})
     });
     if(!response.ok) {
@@ -89,7 +92,7 @@ const updateFavorite = async (film) => {
 
 const deleteFilm = async (filmID) => {
   try{
-    const response = await fetch(SERVER_URL + `/api/films/${filmID}`, { method: 'DELETE' });
+    const response = await fetch(SERVER_URL + `/api/films/${filmID}`, { method: 'DELETE', credentials: 'include' });
     if(!response.ok) {
       const errMessage = await response.json(); 
       throw errMessage;

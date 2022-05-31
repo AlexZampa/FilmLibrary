@@ -4,12 +4,12 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const expressValidator = require('express-validator');
 const FilmDAO = require('./FilmDAO');
+const userDao = require('./UserDAO');
 const { filters } = require('./Film');
 const cors = require('cors');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const session = require('express-session');
-const userDao = require('./UserDAO');
 
 const PORT = 3001;
 const app = new express();
@@ -26,44 +26,43 @@ app.use(cors(corsOptions));
 passport.use(new LocalStrategy(async function verify(username, password, cb) {
     const user = await userDao.getUser(username, password)
     console.log(user);
-    if(!user)
-      return cb(null, false, 'Incorrect username or password.');
-      
+    if (!user || user.error)
+        return cb(null, false, 'Incorrect username or password.');
     return cb(null, user);
-  }));
-  
-  passport.serializeUser(function (user, cb) {
+}));
+
+passport.serializeUser(function (user, cb) {
     cb(null, user);
-  });
-  
-  passport.deserializeUser(function (user, cb) { // this user is id + email + name
+});
+
+passport.deserializeUser(function (user, cb) { // this user is id + email + name
     return cb(null, user);
     // if needed, we can do extra check here (e.g., double check that the user is still in the database, etc.)
-  });
-  
-  const isLoggedIn = (req, res, next) => {
-    if(req.isAuthenticated()) {
-      return next();
+});
+
+const isLoggedIn = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
     }
-    return res.status(401).json({error: 'Not authorized'});
-  }
-  
-  app.use(session({
+    return res.status(401).json({ error: 'Not authorized' });
+}
+
+app.use(session({
     secret: "shhhhh... it's a secret!",
     resave: false,
     saveUninitialized: false,
-  }));
-  app.use(passport.authenticate('session'));
-  
-  
+}));
+app.use(passport.authenticate('session'));
+
+
 
 //CREATE FILM
 app.post('/api/films',
-    [check('id').isInt({ min: 1 }), 
-    check("title").isString(), 
-    check("favorite").isBoolean(), 
-    check("watchDate").optional({checkFalsy: true}).isDate(), 
-    check("rating").isInt(),isLoggedIn],
+    [check('id').isInt({ min: 1 }),
+    check("title").isString(),
+    check("favorite").isBoolean(),
+    check("watchDate").optional({ checkFalsy: true }).isDate(),
+    check("rating").isInt(), isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -84,7 +83,7 @@ app.post('/api/films',
 );
 
 //GET FILM BY ID
-app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }),isLoggedIn],
+app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }), isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -108,7 +107,7 @@ app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }),isLoggedIn],
 );
 
 // GET ALL FILMS
-app.get('/api/films',isLoggedIn,
+app.get('/api/films', isLoggedIn,
     async (req, res) => {
         try {
             const films = await FilmDAO.getAllFilm(1);
@@ -122,7 +121,7 @@ app.get('/api/films',isLoggedIn,
 );
 
 // GET FILTERED FILMS
-app.get('/api/films/filter/:filterid',isLoggedIn,
+app.get('/api/films/filter/:filterid', isLoggedIn,
     async (req, res) => {
         try {
             if (filters[req.params.filterid]) {
@@ -145,8 +144,8 @@ app.put('/api/films/:filmid',
     [check('filmid').isInt({ min: 1 }),
     check("newTitle").exists().isString(),
     check("newFavorite").exists().isBoolean(),
-    check("newWatchdate").optional({checkFalsy: true}).isDate(),
-    check("newRating").exists().isInt(),isLoggedIn],
+    check("newWatchdate").optional({ checkFalsy: true }).isDate(),
+    check("newRating").exists().isInt(), isLoggedIn],
     async (req, res) => {
         try {
             const errors = validationResult(req);
@@ -155,7 +154,7 @@ app.put('/api/films/:filmid',
             }
             const id = req.params.filmid;
             const filmtoUpdate = req.body;
-            
+
             await FilmDAO.updateFilm(filmtoUpdate, id, 1);
             return res.status(200).end();
         }
@@ -199,7 +198,7 @@ app.put('/api/films/:filmid/favorite', [
 
 
 //DELETE FILM
-app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 }),isLoggedIn],
+app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 }), isLoggedIn],
     async (req, res) => {
         const id = req.params.filmid;
         try {
@@ -220,24 +219,40 @@ app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 }),isLoggedIn],
     });
 
 //API ON USERLOGIN 
-app.post('/api/sessions', function(req, res, next) {
+app.post('/api/sessions', function (req, res, next) {
     passport.authenticate('local', (err, user, info) => {
-      if (err)
-        return next(err);
+        if (err)
+            return next(err);
         if (!user) {
-          // display wrong login messages
-          return res.status(401).send(info);
+            // display wrong login messages
+            return res.status(401).send(info);
         }
         // success, perform the login
         req.login(user, (err) => {
-          if (err)
-            return next(err);
-          
-          // req.user contains the authenticated user, we send all the user info back
-          return res.status(201).json(req.user);
+            if (err)
+                return next(err);
+
+            // req.user contains the authenticated user, we send all the user info back
+            return res.status(201).json(req.user);
         });
     })(req, res, next);
-  });
+});
+
+
+// API ON CURRENT SESSION
+app.get('/api/sessions/current', (req, res) => {
+    if (req.isAuthenticated())
+        res.json(req.user);
+    res.status(401).json({ error: 'Not authenticated' });
+});
+
+
+//API ON DELETE SESSIONS
+app.delete('/api/sessions/current', (req, res) => {
+    req.logout(() => {
+        res.end();
+    });
+});
 
 
 

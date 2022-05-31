@@ -15,6 +15,19 @@ function App() {
   const [back, setBack] = useState("/");
   const [message, setMessage] = useState('');
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      await API.getUserInfo(); // we have the user info here
+      setLoggedIn(true);
+    };
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn)
+      getFilm();
+  }, [loggedIn]);
+
 
   const getFilm = async (filterid) => {
     if (filterid) {
@@ -84,18 +97,6 @@ function App() {
       toast.success("Film added!");
     }).catch((err) => { toast.error(err.message); });
   };
-  useEffect(() => {
-    const checkAuth = async () => {
-      await API.getUserInfo(); // we have the user info here
-      setLoggedIn(true);
-    };
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (loggedIn)
-      getFilm();
-  }, [loggedIn]);
 
   const handleLogin = async (credentials) => {
     try {

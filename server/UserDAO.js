@@ -2,49 +2,38 @@
 
 
 const DBmanager = require('./DBmanager');
-
-const db = new DBmanager();
 const crypto = require('crypto');
 
-const salt = 'provadisalt'
+const db = new DBmanager();
 
-exports.getUser = async (email, password) => {
+exports.getUser = (email, password) => {
+  return new Promise(async (resolve, reject) => {
     const sql = 'SELECT * FROM users WHERE email = ?';
-    try{
-        let row = await db.get(sql, [email],true);
-        if(!row){throw 422}
-
-        const user = {id: row.id, username: row.email, name: row.name};
-        crypto.scrypt(password, salt, 32, function(err, hashedPassword) {
-          if (err) reject(err);
-          if(!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
-           {return false;} 
-          else
-          { 
-              return user;
-          }
-        });
-
-    }
-    catch(err){
-        throw err;
-    }
-};
-
-exports.getUserById = (id) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM user WHERE id = ?';
-    db.get(sql, [id], (err, row) => {
-      if (err) { 
-        reject(err); 
-      }
-      else if (row === undefined) { 
-        resolve({error: 'User not found!'}); 
-      }
+    let row = await db.get(sql, [email], true);
+    if (row === undefined)
+      reject (422);
+    const user = { id: row.id, username: row.email, name: row.name };
+    crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
+      if (err)
+        reject (err);
+      if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
+        resolve (false);
       else {
-        const user = {id: row.id, username: row.email, name: row.name};
-        resolve(user);
+        resolve (user);
       }
     });
-  });
+  })
+};
+
+exports.getUserById = async (id) => {
+  try {
+    const sql = 'SELECT * FROM user WHERE id = ?';
+    const row = await db.get(sql, [id], true);
+    if (row === undefined)
+      resolve({ error: 'User not found!' });
+    const user = { id: row.id, username: row.email, name: row.name };
+    return (user);
+  } catch (err) {
+    throw err;
+  }
 };
