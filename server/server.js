@@ -70,7 +70,7 @@ app.post('/api/films',
                 console.log(errors);
                 return res.status(422).json({ msg: "film data invalid" });
             }
-            const result = await FilmDAO.addFilm(req.body.id, req.body.title, req.body.favorite, req.body.watchDate, req.body.rating, 1);
+            const result = await FilmDAO.addFilm(req.body.id, req.body.title, req.body.favorite, req.body.watchDate, req.body.rating, req.user.id);
             return res.status(201).end();
         } catch (err) {
             console.log(err);
@@ -91,7 +91,7 @@ app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }), isLoggedIn],
                 console.log(errors);
                 return res.status(422).json({ msg: "film data invalid" });
             }
-            const result = await FilmDAO.getFilm(req.params.filmid, 1);
+            const result = await FilmDAO.getFilm(req.params.filmid, req.user.id);
             return res.status(200).json(result);
         }
         catch (err) {
@@ -110,7 +110,7 @@ app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }), isLoggedIn],
 app.get('/api/films', isLoggedIn,
     async (req, res) => {
         try {
-            const films = await FilmDAO.getAllFilm(1);
+            const films = await FilmDAO.getAllFilm(req.user.id);
             films.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY/MM/DD') : undefined);
             return res.status(200).json(films);
         } catch (err) {
@@ -125,7 +125,7 @@ app.get('/api/films/filter/:filterid', isLoggedIn,
     async (req, res) => {
         try {
             if (filters[req.params.filterid]) {
-                const films = await FilmDAO.getAllFilm(1);
+                const films = await FilmDAO.getAllFilm(req.user.id);
                 const filteredFilms = filters[req.params.filterid](films);
                 filteredFilms.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY-MM-DD') : undefined);
                 return res.status(200).json(filteredFilms);
@@ -155,7 +155,7 @@ app.put('/api/films/:filmid',
             const id = req.params.filmid;
             const filmtoUpdate = req.body;
 
-            await FilmDAO.updateFilm(filmtoUpdate, id, 1);
+            await FilmDAO.updateFilm(filmtoUpdate, id, req.user.id);
             return res.status(200).end();
         }
         catch (err) {
@@ -182,7 +182,7 @@ app.put('/api/films/:filmid/favorite', [
             }
             const id = req.params.filmid;
             const fav = req.body.favorite;
-            await FilmDAO.updateFilmfav(id, fav, 1);
+            await FilmDAO.updateFilmfav(id, fav, req.user.id);
             res.status(200).end();
         }
         catch (err) {
@@ -202,8 +202,8 @@ app.delete('/api/films/:filmid', [check('filmid').isInt({ min: 1 }), isLoggedIn]
     async (req, res) => {
         const id = req.params.filmid;
         try {
-            const result = await FilmDAO.getFilm(id, 1);
-            await FilmDAO.deleteFilm(id, 1);
+            const result = await FilmDAO.getFilm(id, req.user.id);
+            await FilmDAO.deleteFilm(id, req.user.id);
             res.status(204).end();
         }
         catch (err) {
