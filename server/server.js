@@ -25,6 +25,7 @@ app.use(cors(corsOptions));
 
 passport.use(new LocalStrategy(async function verify(username, password, cb) {
     const user = await userDao.getUser(username, password)
+    console.log(user);
     if(!user)
       return cb(null, false, 'Incorrect username or password.');
       
