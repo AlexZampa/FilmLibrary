@@ -3,6 +3,7 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 const expressValidator = require('express-validator');
+const morgan = require('morgan');
 const FilmDAO = require('./FilmDAO');
 const userDao = require('./UserDAO');
 const { filters } = require('./Film');
@@ -13,7 +14,9 @@ const session = require('express-session');
 
 const PORT = 3001;
 const app = new express();
+
 app.use(express.json());
+app.use(morgan('dev'));
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -238,12 +241,11 @@ app.post('/api/sessions', function (req, res, next) {
     })(req, res, next);
 });
 
-
 // API ON CURRENT SESSION
 app.get('/api/sessions/current', (req, res) => {
     if (req.isAuthenticated())
-        res.json(req.user);
-    res.status(401).json({ error: 'Not authenticated' });
+        return res.json(req.user);
+    return res.status(401).json({ error: 'Not authenticated' });
 });
 
 

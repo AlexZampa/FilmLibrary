@@ -67,3 +67,9 @@
 .active{
   background-color: red;
 }
+
+.navbar-dropdown-item{
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: fit-content !important;
+}

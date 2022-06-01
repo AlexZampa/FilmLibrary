@@ -5,80 +5,80 @@ import { FilmApp } from './filmComponents';
 import { LoginForm } from './authenticationComponents';
 import { FilmForm } from './filmForm';
 import { Outlet } from 'react-router-dom';
-import {useParams} from 'react-router-dom';
-import {useEffect} from 'react';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
-function DefaultRoute(props){
-    return(
+function DefaultRoute(props) {
+    return (
         <Container className='App'>
             <h1>No data here</h1>
         </Container>
     );
 };
 
-function FilmRoute(props){
-    return(
-            <Container fluid className='App'>
-                <Row>
-                    <NavBarApp/>
-                </Row>
-                    <Outlet/>
-            </Container>
+function FilmRoute(props) {
+    return (
+        <Container fluid className='App'>
+            <Row>
+                <NavBarApp logout={props.logout} />
+            </Row>
+            <Outlet />
+        </Container>
     );
 };
 
 
-function EditRoute(props){
-    return(
+function EditRoute(props) {
+    return (
         <Container fluid className='App'>
-        <Row>
-            <NavBarApp/>
-        </Row>
-        <Row>           
-            <Col className='col-9 mt-5 g-5' >
-                <FilmForm films={props.films} addFilm={props.addFilm} updateFilm={props.updateFilm} back={props.back}/>
-            </Col>
-        </Row>
+            <Row>
+                <NavBarApp logout={props.logout} />
+            </Row>
+            <Row>
+                <Col className='col-9 mt-5 g-5' >
+                    <FilmForm films={props.films} addFilm={props.addFilm} updateFilm={props.updateFilm} back={props.back} />
+                </Col>
+            </Row>
         </Container>
-    );  
+    );
 };
 
 
-function FilmPage(props){
-    const {filterid} = useParams();
+function FilmPage(props) {
+    const { filterid } = useParams();
 
-    useEffect(()=>{
+    useEffect(() => {
         props.getFilm(filterid);
-    }, [filterid]); 
+    }, [filterid]);
 
-    return(
-        <Row>        
+    return (
+        <Row>
             <Col xs='auto'>
-                <SideBarApp setBack={props.setBack}/>
+                <SideBarApp setBack={props.setBack} />
             </Col>
             <Col className='col-9 mt-5 g-5' >
-              <FilmApp films={props.films} addFilm={props.addFilm} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm}/>
+                <FilmApp films={props.films} addFilm={props.addFilm} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
             </Col>
-        </Row>   
+        </Row>
     );
 };
 
 function LoginRoute(props) {
-    return(
+    return (
         <Container fluid className='App'>
-        <Row>
-          <Col>
-            <h1>Login</h1>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <LoginForm login={props.login} />
-          </Col>
-        </Row>
+            <Row>
+                <Col>
+                    <h1>Login</h1>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <LoginForm login={props.login} />
+                </Col>
+            </Row>
         </Container>
     );
-  }
-  
+}
 
-export {DefaultRoute, FilmRoute, EditRoute, FilmPage, LoginRoute};
+
+export { DefaultRoute, FilmRoute, EditRoute, FilmPage, LoginRoute };

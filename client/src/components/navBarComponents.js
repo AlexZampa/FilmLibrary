@@ -1,8 +1,8 @@
-import {Navbar, Form} from 'react-bootstrap';
+import {Navbar, Form, NavDropdown} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Film, PersonCircle} from 'react-bootstrap-icons';
 
-function NavBarApp(){
+function NavBarApp(props){
     return(
         <Navbar expand="lg" bg="primary" variant="dark" fixed="top">
             <Navbar.Brand href="#home">
@@ -17,8 +17,10 @@ function NavBarApp(){
                 </Form>
             </Navbar.Collapse>
                 <Navbar.Brand href="#account" className='justify-content-end'>
-                    <PersonCircle color='white' size={25}/>
-                </Navbar.Brand>    
+                    <NavDropdown className='navbar-dropdown-item' drop='down' title={<PersonCircle color='white' size={25}/>} id="basic-nav-dropdown">
+                        <NavDropdown.Item  href="#logout" onClick={props.logout}>logout</NavDropdown.Item>
+                    </NavDropdown>
+                </Navbar.Brand>
       </Navbar>
     )
 };
