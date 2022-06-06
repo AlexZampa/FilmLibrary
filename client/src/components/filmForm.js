@@ -78,7 +78,7 @@ function FilmForm(props) {
           <Col>
             <Form.Group className="mb-3">
                 <Form.Label>Favorite</Form.Label>
-                <Form.Check type="checkbox" id="inlineFormCheck" value={favorite} onChange={event => setFavorite(event.target.checked)}/>
+                <Form.Check type="checkbox" id="inlineFormCheck" defaultChecked={favorite} onChange={event => setFavorite(event.target.checked)}/>
             </Form.Group>
           </Col>
         </Row>

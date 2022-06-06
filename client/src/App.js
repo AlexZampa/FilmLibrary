@@ -31,41 +31,44 @@ function App() {
   const getFilm = async (filterid) => {
     if (filterid) {
       const films = await API.getFilterFilms(filterid);
+      console.log(films)
       setFilms(films);
     }
     else {
       const films = await API.getAllFilms();
+      console.log(films)
       setFilms(films);
     }
   };
 
   // update film
-  const updateFilm = (film, filter, editType) => {
-    /* setFilms(oldFilms => {
+  const updateFilm = async (film, filter, editType) => {
+     /* setFilms(oldFilms => {
       return oldFilms.map(f => {
         if (film.id === f.id) {
           const newFilm = new Film(film.id, film.title, film.favorite, film.watchDate, film.rating);
-          newFilm.status = 'edited';
           return newFilm;
         }
         else
           return f;
       });
-    }); */
+    }); */ 
 
     switch (editType) {
       case 'favorite':
-        API.updateFavorite(film).then(() => {
+        await API.updateFavorite(film).then(() => {
           getFilm(filter);
         }).catch((err) => { getFilm(filter); toast.error('update failed'); });
         break;
       case 'rating':
-        API.updateFilm(film).then(() => {
+        await API.updateFilm(film).then(() => {
           getFilm(filter);
         }).catch((err) => { toast.error('update failed'); });
         break;
       default:
-        API.updateFilm(film).then(() => {
+        await API.updateFilm(film).then(async () => {
+          await getFilm(filter);
+          window.location.reload()
           toast.success("Film updated!");
         }).catch((err) => { toast.error('update failed'); });
     }
@@ -74,7 +77,7 @@ function App() {
 
   // delete film
   const deleteFilm = (filmID, filterid) => {
-    
+
     API.deleteFilm(filmID).then(() => {
 
       getFilm(filterid);
@@ -87,7 +90,7 @@ function App() {
         })
       });
       toast.success("Film deleted!");
-    }).catch((err) => { toast.error('Ipossible to delete'); });
+    }).catch((err) => { toast.error('Impossible to delete'); });
   };
 
   // add film
@@ -98,9 +101,9 @@ function App() {
       toast.success("Film added!");
     }).catch((err) => {
       console.log(err)
-      if(err.err === 404)
-         toast.error(err.message);
-      else{
+      if (err.err === 404)
+        toast.error(err.message);
+      else {
         toast.error('Generic Error')
       }
     });
