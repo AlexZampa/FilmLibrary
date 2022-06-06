@@ -67,7 +67,7 @@ function LoginRoute(props) {
     return (
         <Container fluid className='App'>
             <Row>
-                <Col>
+                <Col className='mt-3'>
                     <h1>Login</h1>
                 </Col>
             </Row>

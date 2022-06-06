@@ -14,12 +14,14 @@ function LoginForm(props) {
 
     return (
         <Form onSubmit={handleSubmit}>
-            <Form.Group controlId='username'>
+            <br/>
+            <Form.Group controlId='username' className="formLogIn">
                 <FloatingLabel label="Email">
                     <Form.Control type='email' value={username} onChange={ev => setUsername(ev.target.value)} required={true} />
                 </FloatingLabel>
             </Form.Group>
-            <Form.Group controlId='password'>
+            <br/>
+            <Form.Group controlId='password'className="formLogIn">
             <FloatingLabel label="password">
                 <Form.Control type='password' value={password} onChange={ev => setPassword(ev.target.value)} required={true} minLength={6} />
                 <Form.Control.Feedback type="invalid">
@@ -27,7 +29,7 @@ function LoginForm(props) {
                 </Form.Control.Feedback>
             </FloatingLabel>
             </Form.Group>
-
+            <br/>
             <Button type="submit">Login</Button>
         </Form>
     )
