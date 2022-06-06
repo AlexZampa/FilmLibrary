@@ -4,8 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { DefaultRoute, FilmRoute, EditRoute, FilmPage, LoginRoute} from './components/filmRoutes';
-import { useState , useEffect} from 'react';
+import { DefaultRoute, FilmRoute, EditRoute, FilmPage, LoginRoute } from './components/filmRoutes';
+import { useState, useEffect } from 'react';
 import API from './API';
 
 
@@ -41,7 +41,7 @@ function App() {
 
   // update film
   const updateFilm = (film, filter, editType) => {
-    setFilms(oldFilms => {
+    /* setFilms(oldFilms => {
       return oldFilms.map(f => {
         if (film.id === f.id) {
           const newFilm = new Film(film.id, film.title, film.favorite, film.watchDate, film.rating);
@@ -51,50 +51,59 @@ function App() {
         else
           return f;
       });
-    });
+    }); */
 
     switch (editType) {
       case 'favorite':
         API.updateFavorite(film).then(() => {
           getFilm(filter);
-        }).catch((err) => { toast.error(err.message); });
+        }).catch((err) => { getFilm(filter); toast.error('update failed'); });
         break;
       case 'rating':
         API.updateFilm(film).then(() => {
           getFilm(filter);
-        }).catch((err) => { toast.error(err.message); });
+        }).catch((err) => { toast.error('update failed'); });
         break;
       default:
         API.updateFilm(film).then(() => {
           toast.success("Film updated!");
-        }).catch((err) => { toast.error(err.message); });
+        }).catch((err) => { toast.error('update failed'); });
     }
   };
 
 
   // delete film
   const deleteFilm = (filmID, filterid) => {
-    setFilms((oldFilms) => {
-      return oldFilms.map(f => {
-        if (f.id === filmID)
-          return { ...f, status: 'deleted' };
-        else
-          return f;
-      })
-    });
+    
     API.deleteFilm(filmID).then(() => {
+
       getFilm(filterid);
+      setFilms((oldFilms) => {
+        return oldFilms.map(f => {
+          if (f.id === filmID)
+            return { ...f, status: 'deleted' };
+          else
+            return f;
+        })
+      });
       toast.success("Film deleted!");
-    }).catch((err) => { toast.error(err.message); });
+    }).catch((err) => { toast.error('Ipossible to delete'); });
   };
 
   // add film
   const addFilm = (film) => {
     film.status = 'added';
-    setFilms((oldFilms) => [...oldFilms, film]);
     API.addFilm(film).then(() => {
+      setFilms((oldFilms) => [...oldFilms, film]);
       toast.success("Film added!");
-    }).catch((err) => { toast.error(err.message); });
+    }).catch((err) => {
+      console.log(err)
+      if(err.err === 404)
+         toast.error(err.message);
+      else{
+        toast.error('Generic Error')
+      }
+    });
   };
 
   // Login
@@ -102,10 +111,9 @@ function App() {
     try {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
-      toast.success(`Welcome, ${user.name}!`, {position: "top-center"});
+      toast.success(`Welcome, ${user.name}!`, { position: "top-center" });
     } catch (err) {
-      console.log(err);
-      toast.error(err, {position: "top-center"});
+      toast.error(err, { position: "top-center" });
     }
   };
 
@@ -125,18 +133,18 @@ function App() {
           loggedIn ? <Navigate replace to='/' /> : <LoginRoute login={handleLogin} />
         } />
         <Route path='/' element={
-          loggedIn ? <FilmRoute logout={handleLogout}/> : <Navigate replace to='/login' />
+          loggedIn ? <FilmRoute logout={handleLogout} /> : <Navigate replace to='/login' />
         } >
           <Route index element={
             loggedIn ? <FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} /> : <Navigate replace to='/login' />} />
         </Route>
         <Route path='*' element={<DefaultRoute />} />
         <Route path="/add" element={
-          loggedIn ? <EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back} logut={handleLogout}/> : <Navigate replace to='/login' />} />
+          loggedIn ? <EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back} logut={handleLogout} /> : <Navigate replace to='/login' />} />
         <Route path="/edit" element={
-        loggedIn ? <EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} logout={handleLogout}/> : <Navigate replace to='/login' />} />
+          loggedIn ? <EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} logout={handleLogout} /> : <Navigate replace to='/login' />} />
         <Route path='/filter' element={
-        loggedIn ? <FilmRoute logout={handleLogout}/> : <Navigate replace to='/login' />}>
+          loggedIn ? <FilmRoute logout={handleLogout} /> : <Navigate replace to='/login' />}>
           <Route index element={<h2>Please, specify a filter</h2>} />
           <Route path=':filterid' element={<FilmPage getFilm={getFilm} films={films} setFilms={setFilms} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} />} />
         </Route>

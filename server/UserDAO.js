@@ -11,17 +11,19 @@ exports.getUser = (email, password) => {
     const sql = 'SELECT * FROM users WHERE email = ?';
     let row = await db.get(sql, [email], true);
     if (row === undefined)
-      reject (422);
-    const user = { id: row.id, username: row.email, name: row.name };
-    crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
-      if (err)
-        reject (err);
-      if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
-        resolve (false);
-      else {
-        resolve (user);
+      resolve(422)
+      else{
+        const user = { id: row.id, username: row.email, name: row.name };
+        crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
+          if (err)
+            reject (err);
+          if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
+            resolve (false);
+          else {
+            resolve (user);
+          }
+        });
       }
-    });
   })
 };
 

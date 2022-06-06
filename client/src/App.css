@@ -79,7 +79,7 @@
   text-align: center !important;
   text-decoration: none !important;
   user-select:none !important;
-  background-color: white;
+  
 }
 .dropdown-box:not(:hover){
   max-width:min-content !important;
@@ -87,6 +87,7 @@
 }
 
 .formLogIn{
-  width: 50%;
-  margin-left: 25%;
+  width: 40%;
+  margin-left: 30%;
+  border-style:double;
 }

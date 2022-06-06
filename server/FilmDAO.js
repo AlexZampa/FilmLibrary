@@ -8,10 +8,11 @@ const db = new DBmanager();
 
 exports.addFilm = async (id, title, favorite, watchdate, rating, user) => {
     try{
-        let sql = "SELECT * FROM films f WHERE f.id=? AND user = ?";
-        let result = await db.get(sql, [id, user], true);
+        let sql = "SELECT * FROM films f WHERE f.id=?";
+        let result = await db.get(sql, [id], true);
+        console.log(result)
         if(result){
-            throw {err: 422, msg: "film already exists"};
+            throw {err: 422, msg: "film ID already exists"};
         }
         sql = "INSERT INTO films (id, title, favorite, watchdate, rating, user) VALUES (?, ?, ?, ?, ?, ?)"
         result = await db.query(sql, [id, title, favorite, watchdate ? watchdate : null, rating, user]);
@@ -51,7 +52,7 @@ exports.updateFilm = async (film, id, user) => {
         await this.getFilm(id, user);
         
     } catch (err) {
-        throw err;
+        throw {err:404, msg: 'Film ID already Exist'};
     }
     try{
         const sql = 'UPDATE films SET title=?, favorite=?, watchdate=?, rating = ? WHERE id=? AND user = ?';

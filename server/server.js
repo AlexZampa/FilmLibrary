@@ -27,11 +27,17 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 passport.use(new LocalStrategy(async function verify(username, password, cb) {
-    const user = await userDao.getUser(username, password)
-    console.log(user);
-    if (!user || user.error)
-        return cb(null, false, 'Incorrect username or password.');
-    return cb(null, user);
+    try{
+
+        const user = await userDao.getUser(username, password)
+        if (!user || user.error || user==422)
+            return cb(null, false, 'Incorrect username or password.');
+        return cb(null, user);
+    }
+    catch(err){
+        throw err;
+    }
+
 }));
 
 passport.serializeUser(function (user, cb) {
@@ -70,17 +76,15 @@ app.post('/api/films',
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                console.log(errors);
                 return res.status(422).json({ msg: "film data invalid" });
             }
             const result = await FilmDAO.addFilm(req.body.id, req.body.title, req.body.favorite, req.body.watchDate, req.body.rating, req.user.id);
             return res.status(201).end();
         } catch (err) {
-            console.log(err);
             if (err.err === 422) {
                 return res.status(422).json({ msg: err.msg });
             }
-            return res.status(503).end();
+            return res.status(503).json({msg :'Error in Database' });
         }
     }
 );
@@ -91,14 +95,12 @@ app.get('/api/films/:filmid', [check('filmid').isInt({ min: 1 }), isLoggedIn],
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                console.log(errors);
                 return res.status(422).json({ msg: "film data invalid" });
             }
             const result = await FilmDAO.getFilm(req.params.filmid, req.user.id);
             return res.status(200).json(result);
         }
         catch (err) {
-            console.log(err);
             switch (err.err) {
                 case 404:
                     return res.status(404).json({ msg: err.msg });
@@ -117,7 +119,6 @@ app.get('/api/films', isLoggedIn,
             films.forEach(f => f.watchDate ? f.watchDate = f.watchDate.format('YYYY/MM/DD') : undefined);
             return res.status(200).json(films);
         } catch (err) {
-            console.log(err);
             return res.status(500).end();
         }
     }
@@ -135,7 +136,6 @@ app.get('/api/films/filter/:filterid', isLoggedIn,
             }
             return res.status(422).json({ msg: "invalid filter" });
         } catch (err) {
-            console.log(err);
             return res.status(500).end();
         }
     }
