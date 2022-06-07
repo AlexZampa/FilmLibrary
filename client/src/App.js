@@ -37,16 +37,16 @@ function App() {
         const films = await API.getFilterFilms(filterid);
         setFilms(films);
       } catch (err) {
-        if(err.err === 401)
+        if (err.err === 401)
           setLoggedIn(false);
-       }
+      }
     }
     else {
       try {
         const films = await API.getAllFilms();
         setFilms(films);
-      } catch (err) { 
-        if(err.err === 401)
+      } catch (err) {
+        if (err.err === 401)
           setLoggedIn(false);
       }
     }
@@ -154,15 +154,17 @@ function App() {
         <Route path='/login' element={
           loggedIn ? <Navigate replace to='/' /> : <LoginRoute login={handleLogin} />
         } />
-        <Route path='/' element={
-          loggedIn ? <FilmRoute logout={handleLogout} /> : <Navigate replace to='/login' />
-        } >
+        <Route path='/' element={<FilmRoute logout={handleLogout} />} >
+
           <Route index element={
-            loggedIn ? <FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack}/> : <Navigate replace to='/login' />} />
+            loggedIn ? <FilmPage getFilm={getFilm} setFilms={setFilms} films={films} addFilm={addFilm} updateFilm={updateFilm} deleteFilm={deleteFilm} setBack={setBack} /> : <Navigate replace to='/login' />} />
         </Route>
+
         <Route path='*' element={<DefaultRoute />} />
+
         <Route path="/add" element={
           loggedIn ? <EditRoute films={films} addFilm={addFilm} updateFilm={updateFilm} back={back} logut={handleLogout} /> : <Navigate replace to='/login' />} />
+
         <Route path="/edit" element={
           loggedIn ? <EditRoute updateFilm={updateFilm} addFilm={addFilm} back={back} logout={handleLogout} /> : <Navigate replace to='/login' />} />
         <Route path='/filter' element={

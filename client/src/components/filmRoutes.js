@@ -7,7 +7,6 @@ import { FilmForm } from './filmForm';
 import { Outlet } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import API from '../API';
 
 function DefaultRoute(props) {
     return (
@@ -49,7 +48,6 @@ function FilmPage(props) {
     const { filterid } = useParams();
 
     useEffect(() => {
-        console.log(filterid);
         props.getFilm(filterid);
     }, [filterid]);
 
