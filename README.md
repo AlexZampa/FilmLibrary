@@ -32,6 +32,7 @@ If you decide to add additional users, please remember to add them to this table
 |-------|----------|------|
 | john.doe@polito.it | password | John |
 | mario.rossi@polito.it | password | Mario |
+| testuser@polito.it | password | Frank |
 
 ## List of APIs offered by the server
 
