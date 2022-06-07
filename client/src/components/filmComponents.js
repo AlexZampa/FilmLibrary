@@ -5,7 +5,7 @@ import { Rating } from 'react-simple-star-rating'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { PencilSquare, Trash3Fill } from 'react-bootstrap-icons';
 import { PlusCircleFill } from 'react-bootstrap-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { Film } from './../filmLibrary'
 import { Link, useParams } from 'react-router-dom';
@@ -80,18 +80,18 @@ function FilmRow(props) {
 };
 
 function FilmData(props) {
-    const [fav, setFav] = useState(props.film.favorite)
+    const [fav, setFav] = useState(props.film.favorite);
 
     // Catch Rating value
-    const handleFav = (fav) => {
-        setFav(fav);
-        props.updateFilm(new Film(props.film.id, props.film.title, fav, props.film.watchDate, props.film.rating), props.filter, 'favorite');
+    const handleFav = (favorite) => {
+        setFav(favorite);
+        props.updateFilm(new Film(props.film.id, props.film.title, favorite, props.film.watchDate, props.film.rating), props.filter, 'favorite');
     }
 
     return (
         <>
             <td align="left">
-                <Link to={'/edit'} state={{ film: props.film, date: dayjs(props.film.watchDate).format('YYYY-MM-DD'), filter: props.filter}} >
+                <Link to={'/edit'} state={{ film: props.film, date: dayjs(props.film.watchDate).format('YYYY-MM-DD'), filter: props.filter }} >
                     <Button variant="outlined"> <PencilSquare /> </Button>
                 </Link>
                 <Button variant="outlined" onClick={() => props.deleteFilm(props.film.id, props.filter)}><Trash3Fill /> </Button>
@@ -100,15 +100,13 @@ function FilmData(props) {
             <td>
                 <Form>
                     <Form.Group>
-                        <FormCheck type="checkbox"
-                            defaultChecked={fav}
-                            onChange={event => handleFav(event.target.checked)} />
+                        <FormCheck type="checkbox" defaultChecked={fav} onChange={event => handleFav(event.target.checked)} />
                         Favorite
                     </Form.Group>
                 </Form>
             </td>
             <td> {props.film.watchDate ? dayjs(props.film.watchDate).format("YYYY-MM-DD") : ""} </td>
-            <td> <StarRating film={props.film} updateFilm={props.updateFilm} filter={props.filter}/> </td>
+            <td> <StarRating film={props.film} updateFilm={props.updateFilm} filter={props.filter} /> </td>
         </>);
 };
 

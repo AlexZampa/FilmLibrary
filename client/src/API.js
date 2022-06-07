@@ -12,7 +12,9 @@ const getAllFilms = async () => {
     else
       throw filmJson;
   }catch(err){
-    throw new Error(err.msg);
+    const error = new Error(err.msg);
+    error.err = err.err;
+    throw error
   }
 };
 
@@ -26,7 +28,10 @@ const getFilterFilms = async (filterId) => {
     else
       throw filmJson;
   } catch(err){
-    throw new Error(err.msg);
+    console.log(err);
+    const error = new Error(err.msg);
+    error.err = err.err;
+    throw error
   }
 };
 
@@ -124,14 +129,18 @@ const logIn = async (credentials) => {
 };
 
 const getUserInfo = async () => {
-  const response = await fetch(SERVER_URL + '/api/sessions/current', {
-    credentials: 'include',
-  });
-  const user = await response.json();
-  if (response.ok) {
-    return user;
-  } else {
-    throw user; 
+  try {
+    const response = await fetch(SERVER_URL + '/api/sessions/current', {
+      credentials: 'include',
+    });
+    const user = await response.json();
+    if (response.ok) {
+      return user;
+    } else {
+      throw user; 
+    }
+  } catch (err) {
+    throw new Error('No session available');
   }
 };
 

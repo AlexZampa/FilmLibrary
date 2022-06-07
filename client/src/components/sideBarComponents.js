@@ -4,7 +4,7 @@ import '../App.css'
 import {NavLink, useParams} from 'react-router-dom';    
 
 function SideBarApp(props){
-    const {filterid} = useParams();
+    const { filterid } = useParams();
     return(
         <Navbar expand="lg"> 
             <Nav className="sidebar">
