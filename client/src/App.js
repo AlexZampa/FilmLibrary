@@ -13,14 +13,17 @@ function App() {
   const [films, setFilms] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
   const [back, setBack] = useState("/");
+  const[show, setShow] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         await API.getUserInfo();
         setLoggedIn(true);
+        setShow(true);
       } catch (err) {
         setLoggedIn(false);
+        setShow(true);
       }
     };
     checkAuth();
@@ -146,8 +149,8 @@ function App() {
     setFilms([]);
   };
 
-
   return (
+    show &&
     <BrowserRouter>
       <ToastContainer position="top-right" theme="light" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover={false} limit={3} transition={Slide} />
       <Routes>
