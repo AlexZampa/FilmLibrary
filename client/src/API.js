@@ -28,7 +28,6 @@ const getFilterFilms = async (filterId) => {
     else
       throw filmJson;
   } catch(err){
-    console.log(err);
     const error = new Error(err.msg);
     error.err = err.err;
     throw error

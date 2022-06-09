@@ -122,7 +122,6 @@ function App() {
       setFilms((oldFilms) => [...oldFilms, film]);
       toast.success("Film added!");
     }).catch((err) => {
-      console.log(err);
       if (err.message)
         toast.error(err.message);
       else {

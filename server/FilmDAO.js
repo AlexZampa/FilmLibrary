@@ -10,7 +10,6 @@ exports.addFilm = async (id, title, favorite, watchdate, rating, user) => {
     try{
         let sql = "SELECT * FROM films f WHERE f.id=?";
         let result = await db.get(sql, [id], true);
-        console.log(result)
         if(result){
             throw {err: 422, msg: "film ID already exists"};
         }
