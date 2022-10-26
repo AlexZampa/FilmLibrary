@@ -1,0 +1,7 @@
+{
+    "$schema": "filmschema.json",
+    "film": {
+        "id": 1,
+        "title": "Avatar"
+    }
+}

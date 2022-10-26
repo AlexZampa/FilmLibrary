@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "filmschema.json",
+
+    "definitions": {
+        "user": {
+            "$id": "#definitions/user",
+            "type": "object",
+            "properties": {
+                "id": {"type": "integer", "minimum": 1},
+                "name": {"type": "string"},
+                "email": {"type": "string", "format": "email"},
+                "password": {"type":"string", "minLength": 6}
+            },
+            "required": ["id", "email"]   
+        },
+        "film": {
+            "$id": "#definitions/film",
+            "type": "object",
+            "properties": {
+                "id": {"type": "integer", "minimum": 1},
+                "title": {"type": "string"},
+                "owner": {"type": "integer", "minimum": 1},
+                "private": {"type":"boolean", "default": true},
+                "watchDate": {"type":"string", "format": "date"},
+                "rating": {"type": "integer", "minimum": 0, "maximum": 10},
+                "favorite": {"type": "boolean", "default": false}
+            },
+            "dependencies": {
+                "watchDate": {"properties": {"private": {"const": true}}},
+                "rating": {"properties": {"private": {"const": true}}},
+                "favorite": {"properties": {"private": {"const": true}}}
+            },
+            "required": ["id", "title", "owner"]
+        },
+        "review": {
+            "$id": "#definitions/review",
+            "type": "object",
+            "properties": {
+                "filmId": {"type": "integer", "minimum": 1},
+                "reviewerId": {"type": "integer", "minimum": 1},
+                "completed": {"type":"boolean", "default": false},
+                "reviewDate": {"type": "string", "format": "date"},
+                "rating": {"type": "integer", "minimum": 0, "maximum": 10},
+                "review": {"type": "string", "maxLength": 1000}
+            },
+            "dependencies": {
+                "reviewDate": {"properties": {"completed": {"const": true}}},
+                "rating": {"properties": {"completed": {"const": true}}},
+                "review": {"properties": {"completed": {"const": true}}}
+            },
+            "if": {
+                "properties": {
+                    "completed": {"const": true}
+                },
+                "required": ["completed"]
+            },
+            "then": {
+                "required": ["reviewDate", "rating", "review"]
+            },
+            "required": ["filmId", "reviewerId", "completed"]
+        }
+
+    },
+    "type": "object",
+      "properties": {
+        "films": {
+            "type":"array", "items": { "$ref": "#definitions/film" }
+        },
+        "users": {
+            "type":"array", "items": { "$ref": "#definitions/user" }
+        },
+        "reviews": {
+            "type": "array", "items": {"$ref": "#definitions/review"}
+        } 
+    }
+}
